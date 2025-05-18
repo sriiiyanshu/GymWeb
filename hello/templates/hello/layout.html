@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ page_title|default:"Fitness Routine Checklist" }}</title>
+    <!-- Bootstrap 5 CSS, Font Awesome, and Google Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --primary-color: #6366f1;
+        --primary-hover: #4f46e5;
+        --background-dark: #0f172a;
+        --card-bg: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+      }
+
+      body {
+        background-color: var(--background-dark);
+        color: var(--text-primary);
+        font-family: "Poppins", sans-serif;
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      .exercise-card {
+        background-color: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 16px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .exercise-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+
+      .timer-display {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        min-width: 100px;
+        text-align: center;
+        padding: 0.5rem;
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 12px;
+        letter-spacing: -0.5px;
+      }
+
+      .exercise-media {
+        height: 200px; /* Fixed height for all media containers */
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+      }
+
+      .exercise-media img,
+      .exercise-media video {
+        width: auto;
+        height: 100%;
+        max-height: 200px;
+        object-fit: contain; /* This maintains aspect ratio */
+        margin: auto;
+      }
+
+      .media-placeholder {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 2px dashed rgba(255, 255, 255, 0.1);
+        height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: auto;
+        border-radius: 12px;
+        transition: border-color 0.2s ease;
+      }
+
+      .media-placeholder:hover {
+        border-color: var(--primary-color);
+      }
+
+      .exercise-image {
+        margin-top: auto;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+
+      .exercise-image img {
+        max-height: 200px;
+        width: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .exercise-image:hover img {
+        transform: scale(1.05);
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+      }
+
+      .btn-primary:disabled {
+        background-color: rgba(99, 102, 241, 0.3);
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .form-check-input {
+        width: 1.5rem;
+        height: 1.5rem;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        margin-top: 0.25rem;
+      }
+
+      .form-check-input:checked {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+      }
+
+      .form-check-input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .card {
+        --bs-card-bg: var(--card-bg);
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+
+      .card-header {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+        border-radius: 16px 16px 0 0 !important;
+      }
+
+      .card-header h2 {
+        font-weight: 700;
+        color: var(--primary-color);
+        margin: 0;
+        font-size: 1.5rem;
+      }
+
+      .navbar {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1rem 0;
+      }
+
+      .navbar-brand {
+        color: var(--primary-color) !important;
+        font-weight: 700;
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
+      }
+
+      .exercise-card h3 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1.25rem;
+      }
+
+      .text-muted {
+        color: var(--text-secondary) !important;
+      }
+
+      .small {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      /* Progress indicator for exercises */
+      .progress-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+      }
+
+      .progress-indicator .badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 600;
+      }
+
+      .badge-sets {
+        background-color: rgba(99, 102, 241, 0.2);
+        color: var(--primary-color);
+      }
+
+      .badge-reps {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: var(--success-color);
+      }
+
+      .total-time-counter {
+        background: rgba(99, 102, 241, 0.15);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      .total-time-counter h3 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .total-time-display {
+        font-family: "Poppins", monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        background: rgba(99, 102, 241, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        min-width: 120px;
+        text-align: center;
+      }
+
+      .time-active {
+        color: var(--warning-color);
+      }
+
+      .btn-group {
+        gap: 0.5rem;
+      }
+
+      .rest-timer-skip {
+        border-color: var(--danger-color);
+        color: var(--danger-color);
+      }
+
+      .rest-timer-skip:hover {
+        background-color: var(--danger-color);
+        border-color: var(--danger-color);
+        color: white;
+      }
+
+      .start-day-btn {
+        background-color: var(--success-color);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+      }
+
+      .start-day-btn.active {
+        background-color: var(--danger-color);
+      }
+
+      .start-day-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+      }
+
+      .sets-group {
+        display: flex;
+        gap: 1rem; /* Increased from 0.5rem to add more space between set items */
+        flex-wrap: wrap;
+        align-items: center; /* Added to vertically align checkboxes and labels */
+      }
+
+      .form-check-inline {
+        margin-right: 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .set-checkbox {
+        width: 1.75rem !important;
+        height: 1.75rem !important;
+        border-radius: 6px !important;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .set-checkbox:checked {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+      }
+
+      .set-checkbox:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .form-check-label {
+        color: var(--text-secondary);
+        font-size: 1rem; /* Increased from 0.875rem */
+        font-weight: 500;
+        margin-left: 0.5rem; /* Added spacing between checkbox and label */
+      }
+
+      .day-toggle {
+        color: var(--text-primary) !important;
+        transition: color 0.2s ease;
+        display: flex;
+        align-items: center;
+        text-decoration: none !important;
+        padding: 0.5rem 0;
+        border: none;
+      }
+
+      .day-toggle:hover {
+        color: var(--primary-color) !important;
+      }
+
+      .day-toggle .collapse-icon {
+        transition: transform 0.3s ease;
+        font-size: 1rem;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .day-toggle[aria-expanded="true"] .collapse-icon {
+        transform: rotate(90deg);
+      }
+
+      .collapse {
+        transition: height 0.3s ease-out;
+      }
+
+      .table-dark {
+        background-color: var(--card-bg);
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .table-dark thead th {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        font-weight: 600;
+        padding: 1rem;
+      }
+
+      .table-dark td {
+        padding: 1rem;
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      @media (max-width: 768px) {
+        .exercise-card {
+          margin-bottom: 1rem;
+          padding: 1rem;
+        }
+
+        .timer-display {
+          font-size: 1.5rem;
+          min-width: 80px;
+        }
+
+        .btn-primary {
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
+        }
+
+        .card-header {
+          padding: 1rem;
+        }
+
+        .card-header h2 {
+          font-size: 1.25rem;
+        }
+      }
+
+      /* Custom animations */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .timer-active {
+        animation: pulse 1s infinite;
+        color: var(--warning-color);
+      }
+
+      .timer-complete {
+        color: var(--success-color);
+      }
+
+      .timer-warning {
+        color: var(--danger-color);
+      }
+    </style>
+  </head>
+  <body class="bg-dark text-light">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="/">🏋️‍♂️ Fitness Routine Checklist</a>
+      </div>
+    </nav>
+
+    <div class="container" style="margin-top: 5rem">{% block content %} {% endblock %}</div>
+
+    <!-- Copyright Footer -->
+    <footer class="mt-5 py-3 text-center text-secondary">
+      <div class="container">
+        <p class="mb-0">&copy; {% now "Y" %} Sriyanshu Azad. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap 5 JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Timer JavaScript -->
+    <script>
+      let workoutTimers = {};
+      let totalTimeByDay = {};
+      let activeTimersByDay = {};
+      let dayTimerIntervals = {};
+      let exerciseProgress = {};
+
+      function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, "0")}`;
+      }
+
+      function initializeExerciseProgress(dayId) {
+        const card = document.querySelector(`[data-day-id="${dayId}"]`);
+        const exercises = card.querySelectorAll(".exercise-card");
+
+        exercises.forEach((exercise) => {
+          const exerciseId = exercise.dataset.exerciseId;
+          exerciseProgress[exerciseId] = {
+            completedSets: 0,
+            totalSets: exercise.querySelectorAll(".set-checkbox").length,
+            isResting: false,
+          };
+        });
+      }
+
+      function showToast(message, type = "success") {
+        const toastDiv = document.createElement("div");
+        toastDiv.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+        toastDiv.setAttribute("role", "alert");
+        toastDiv.setAttribute("aria-live", "assertive");
+        toastDiv.setAttribute("aria-atomic", "true");
+
+        toastDiv.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+
+        document.body.appendChild(toastDiv);
+        const toast = new bootstrap.Toast(toastDiv);
+        toast.show();
+
+        toastDiv.addEventListener("hidden.bs.toast", () => {
+          toastDiv.remove();
+        });
+      }
+
+      function saveWorkoutHistory(dayId, dayTitle, duration, completedExercises) {
+        const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+        if (!csrfToken) {
+          console.error("CSRF token not found");
+          showToast("Error: CSRF token not found", "danger");
+          return;
+        }
+
+        const data = {
+          dayId: dayId,
+          dayTitle: dayTitle,
+          duration: duration,
+          completedExercises: completedExercises,
+        };
+
+        fetch("/save-workout/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+          },
+          body: JSON.stringify(data),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data.status === "success") {
+              showToast("Workout saved successfully!");
+              setTimeout(() => {
+                window.location.reload();
+              }, 1500);
+            } else {
+              throw new Error(data.message || "Failed to save workout");
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            showToast(error.message || "Failed to save workout", "danger");
+          });
+      }
+
+      function toggleDayTimer(buttonElement, dayId) {
+        const card = buttonElement.closest(".card");
+        const setCheckboxes = card.querySelectorAll(".set-checkbox");
+        const restButtons = card.querySelectorAll(".rest-timer-btn");
+        const skipButtons = card.querySelectorAll(".rest-timer-skip");
+        const collapseElement = card.querySelector(`#day-${dayId}`);
+        const collapse = new bootstrap.Collapse(collapseElement, { toggle: false });
+
+        if (!workoutTimers[dayId]) {
+          // Start workout
+          workoutTimers[dayId] = {
+            startTime: Date.now(),
+            isRunning: true,
+          };
+
+          buttonElement.textContent = "End Workout";
+          buttonElement.classList.add("active");
+
+          // Expand the workout section
+          collapse.show();
+
+          // Enable set checkboxes
+          setCheckboxes.forEach((checkbox) => {
+            checkbox.disabled = false;
+          });
+
+          // Initialize exercise progress tracking
+          initializeExerciseProgress(dayId);
+
+          // Start the workout timer
+          dayTimerIntervals[dayId] = setInterval(() => {
+            if (workoutTimers[dayId].isRunning) {
+              const elapsed = Math.floor((Date.now() - workoutTimers[dayId].startTime) / 1000);
+              const display = document.querySelector(`#total-time-${dayId}`);
+              if (display) {
+                display.textContent = formatTime(elapsed);
+                display.classList.add("time-active");
+              }
+            }
+          }, 1000);
+
+          // Add event listeners to set checkboxes
+          setCheckboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", function () {
+              if (this.checked) {
+                const exerciseId = this.dataset.exerciseId;
+                const setNumber = parseInt(this.dataset.setNumber);
+                const exerciseCard = this.closest(".exercise-card");
+                const progress = exerciseProgress[exerciseId];
+
+                if (!progress.isResting) {
+                  progress.completedSets++;
+
+                  // If not the last set, start rest timer automatically
+                  if (progress.completedSets < progress.totalSets) {
+                    const restButton = exerciseCard.querySelector(".rest-timer-btn");
+                    startRestTimer(restButton, 60);
+                  }
+                }
+              }
+            });
+          });
+        } else {
+          // End workout
+          clearInterval(dayTimerIntervals[dayId]);
+          workoutTimers[dayId].isRunning = false;
+
+          // Calculate total duration
+          const duration = Math.floor((Date.now() - workoutTimers[dayId].startTime) / 1000);
+
+          // Get completed exercises data
+          const card = buttonElement.closest(".card");
+          const completedSets = Array.from(card.querySelectorAll(".set-checkbox:checked")).length;
+
+          // Save workout history
+          const dayTitle = card.querySelector(".h4").textContent;
+          saveWorkoutHistory(dayId, dayTitle, duration, {
+            completed_sets: completedSets,
+          });
+
+          buttonElement.textContent = "Start Workout";
+          buttonElement.classList.remove("active");
+
+          // Collapse the workout section
+          collapse.hide();
+
+          // Disable set checkboxes and rest timer buttons
+          setCheckboxes.forEach((checkbox) => {
+            checkbox.disabled = true;
+          });
+          restButtons.forEach((btn) => (btn.disabled = true));
+          skipButtons.forEach((btn) => (btn.disabled = true));
+
+          const display = document.querySelector(`#total-time-${dayId}`);
+          if (display) {
+            display.classList.remove("time-active");
+          }
+
+          // Clear exercise progress
+          exerciseProgress = {};
+        }
+      }
+
+      function startRestTimer(buttonElement, duration) {
+        const exerciseCard = buttonElement.closest(".exercise-card");
+        const exerciseId = exerciseCard.dataset.exerciseId;
+        const progress = exerciseProgress[exerciseId];
+
+        // Set resting state
+        progress.isResting = true;
+
+        const timerDisplay = buttonElement.parentElement.parentElement.querySelector(".rest-timer");
+        const skipButton = buttonElement.nextElementSibling;
+        const setCheckboxes = exerciseCard.querySelectorAll(".set-checkbox");
+        let timeLeft = duration;
+
+        // Disable checkboxes during rest
+        setCheckboxes.forEach((checkbox) => {
+          if (!checkbox.checked) {
+            checkbox.disabled = true;
+          }
+        });
+
+        // Disable the rest timer button
+        buttonElement.disabled = true;
+
+        // Add active animation class
+        timerDisplay.classList.add("timer-active");
+
+        const timer = setInterval(() => {
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            timerDisplay.textContent = "60s";
+            buttonElement.disabled = false;
+            skipButton.disabled = false;
+            timerDisplay.classList.remove("timer-active", "timer-warning");
+            timerDisplay.classList.add("timer-complete");
+
+            // Re-enable checkboxes after rest
+            setCheckboxes.forEach((checkbox) => {
+              if (!checkbox.checked) {
+                checkbox.disabled = false;
+              }
+            });
+
+            // Reset resting state
+            progress.isResting = false;
+
+            // Play notification sound
+            const audio = new Audio(
+              "data:audio/wav;base64,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"
+            );
+            audio.play();
+
+            setTimeout(() => {
+              timerDisplay.classList.remove("timer-complete");
+            }, 1000);
+          } else {
+            timerDisplay.textContent = timeLeft + "s";
+            if (timeLeft <= 5) {
+              timerDisplay.classList.remove("timer-active");
+              timerDisplay.classList.add("timer-warning");
+            }
+          }
+          timeLeft--;
+        }, 1000);
+
+        // Store the timer reference to allow skipping
+        timerDisplay.dataset.timerId = timer;
+        // Enable skip button
+        skipButton.disabled = false;
+      }
+
+      function skipRestTimer(buttonElement) {
+        const timerContainer = buttonElement.parentElement.parentElement;
+        const timerDisplay = timerContainer.querySelector(".rest-timer");
+        const restButton = buttonElement.previousElementSibling;
+        const exerciseCard = buttonElement.closest(".exercise-card");
+        const exerciseId = exerciseCard.dataset.exerciseId;
+        const progress = exerciseProgress[exerciseId];
+        const setCheckboxes = exerciseCard.querySelectorAll(".set-checkbox");
+
+        // Clear the running timer
+        const timerId = parseInt(timerDisplay.dataset.timerId);
+        if (timerId) {
+          clearInterval(timerId);
+        }
+
+        // Reset the display
+        timerDisplay.textContent = "60s";
+        timerDisplay.classList.remove("timer-active", "timer-warning", "timer-complete");
+
+        // Re-enable checkboxes
+        setCheckboxes.forEach((checkbox) => {
+          if (!checkbox.checked) {
+            checkbox.disabled = false;
+          }
+        });
+
+        // Reset resting state
+        progress.isResting = false;
+
+        // Re-enable the rest button
+        restButton.disabled = false;
+        buttonElement.disabled = true;
+      }
+
+      // Add event listeners for collapse events
+      document.addEventListener("DOMContentLoaded", function () {
+        const collapseElements = document.querySelectorAll(".collapse");
+
+        collapseElements.forEach((collapse) => {
+          collapse.addEventListener("show.bs.collapse", function () {
+            const button = document.querySelector(`[data-bs-target="#${this.id}"]`);
+            button.classList.add("active");
+          });
+
+          collapse.addEventListener("hide.bs.collapse", function () {
+            const button = document.querySelector(`[data-bs-target="#${this.id}"]`);
+            button.classList.remove("active");
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,126 @@
+{% extends "hello/layout.html" %} {% load static %} {% load custom_filters %} {% block content %} {% csrf_token %}
+<!-- Workout History Section -->
+<div class="workout-history mb-4">
+  <div class="card bg-dark border-secondary">
+    <div class="card-header border-secondary">
+      <h2 class="h4 mb-0">Workout History</h2>
+    </div>
+    <div class="card-body">
+      {% if workout_history %}
+      <div class="table-responsive">
+        <table class="table table-dark table-hover">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Workout</th>
+              <th>Duration</th>
+              <th>Completed Sets</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for workout in workout_history %}
+            <tr>
+              <td>{{ workout.completed_date|date:"F d, Y - H:i" }}</td>
+              <td>{{ workout.day_title }}</td>
+              <td>{{ workout.get_duration_display }}</td>
+              <td>{% with completed_sets=workout.completed_exercises.completed_sets|default:0 %} {{ completed_sets }} sets {% endwith %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted">No workout history available yet. Complete a workout to see it here!</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Existing Workout Cards -->
+<div class="row">
+  {% for routine in routines %}
+  <div class="col-12 mb-4">
+    <div class="card bg-dark border-secondary" data-day-id="{{ routine.id }}">
+      <div class="card-header border-secondary">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <div class="d-flex align-items-center">
+            <button class="btn btn-link text-light day-toggle me-2 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#day-{{ routine.id }}" aria-expanded="false">
+              <i class="fas fa-chevron-right collapse-icon me-2"></i>
+              <h2 class="h4 mb-0 d-inline">{{ routine.title }}</h2>
+            </button>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <div class="total-time-counter">
+              <span class="text-muted me-2">Time:</span>
+              <span id="total-time-{{ routine.id }}" class="total-time-display">0:00</span>
+            </div>
+            <button id="start-day-{{ routine.id }}" class="btn btn-success start-day-btn" onclick="toggleDayTimer(this, {{ routine.id }})">Start Workout</button>
+          </div>
+        </div>
+      </div>
+      <div id="day-{{ routine.id }}" class="collapse">
+        <div class="card-body">
+          <div class="row">
+            {% for exercise in routine.exercises %}
+            <div class="col-12 col-md-6 col-lg-4 mb-3">
+              <div class="exercise-card" data-exercise-id="{{ routine.id }}-{{ forloop.counter }}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <h3 class="h5 mb-1">{{ exercise.name }}</h3>
+                    <div class="text-muted small mb-2">{{ exercise.sets }} sets × {{ exercise.reps }}</div>
+                  </div>
+                  <div class="exercise-progress text-end">
+                    <span class="text-muted small">Sets:</span>
+                    <div class="sets-group mt-1">
+                      {% with ''|center:exercise.sets as range %} {% for _ in range %}
+                      <div class="form-check form-check-inline">
+                        <input
+                          class="form-check-input set-checkbox"
+                          type="checkbox"
+                          id="set-{{ routine.id }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                          data-exercise-id="{{ routine.id }}-{{ forloop.parentloop.counter }}"
+                          data-set-number="{{ forloop.counter }}"
+                          disabled
+                        />
+                        <label class="form-check-label small" for="set-{{ routine.id }}-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"> {{ forloop.counter }} </label>
+                      </div>
+                      {% endfor %} {% endwith %}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="timer-display rest-timer">60s</span>
+                  <div class="btn-group">
+                    <button class="btn btn-primary rest-timer-btn" onclick="startRestTimer(this, 60)" disabled>Rest Timer</button>
+                    <button class="btn btn-outline-danger rest-timer-skip" onclick="skipRestTimer(this)" disabled>Skip</button>
+                  </div>
+                </div>
+
+                {% if exercise.image_path %}
+                <div class="exercise-media mb-2">
+                  {% if exercise.image_path|lower|endswith:'.mp4' %}
+                  <video class="img-fluid rounded" autoplay loop muted playsinline>
+                    <source src="{{ exercise.image_path }}" type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                  {% else %}
+                  <img src="{{ exercise.image_path }}" alt="{{ exercise.name }}" class="img-fluid rounded" />
+                  {% endif %}
+                </div>
+                {% else %}
+                <div class="media-placeholder">
+                  <span class="text-muted">No media available</span>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
