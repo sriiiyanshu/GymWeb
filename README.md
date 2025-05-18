@@ -1,21 +1,89 @@
-# Django Template
+# Fitness Exercise Application
 
-This sample repo contains the recommended structure for a Python Django project. In this sample, we use `django` to build a web application and the `unittest` to run tests.
+A Django-based web application that provides information about various exercises, including demonstration videos, images, and proper form instructions.
 
-For a more in-depth tutorial, see our [Django tutorial](https://code.visualstudio.com/docs/datascience/data-science-tutorial).
+## Project Overview
 
-The code in this repo aims to follow Python style guidelines as outlined in [PEP 8](https://peps.python.org/pep-0008/).
+This application serves as a comprehensive fitness resource, featuring:
+- Exercise demonstrations through videos and images
+- Proper form instructions for various exercises
+- Categories including strength training, bodyweight exercises, and more
+- Rich media content for exercises targeting different muscle groups
 
-## Running the Sample
+## Project Structure
 
-To successfully run this example, we recommend the following VS Code extensions:
-- [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-- [Python Debugger](https://marketplace.visualstudio.com/items?itemName=ms-python.debugpy)
-- [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance) 
+```
+├── content/               # Exercise media files (videos, images)
+├── django-template/      # Main Django project directory
+├── extraction/           # Scripts for data processing
+├── hevy_images_filtered/ # Processed exercise images
+├── hevy_videos/         # Exercise video content
+└── static/              # Static files for the web interface
+```
 
-- Open the template folder in VS Code (**File** > **Open Folder...**)
-- Create a Python virtual environment using the **Python: Create Environment** command found in the Command Palette (**View > Command Palette**). Ensure you install dependencies found in the `pyproject.toml` file
-- Ensure your newly created environment is selected using the **Python: Select Interpreter** command found in the Command Palette
-- Create and initialize the database by running `python manage.py migrate` in an activated terminal. 
-- Run the app using the Run and Debug view or by pressing `F5`
-- Run tests by running `python manage.py test` in an activated terminal
+## Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package manager)
+- Virtual environment (recommended)
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd <project-directory>
+```
+
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On macOS/Linux
+```
+
+3. Install required dependencies:
+```bash
+cd django-template
+pip install -r requirements.txt
+```
+
+4. Initialize the database:
+```bash
+python manage.py migrate
+```
+
+## Running the Application
+
+1. Make sure you're in the django-template directory and your virtual environment is activated
+
+2. Start the development server:
+```bash
+python manage.py runserver
+```
+
+3. Open your web browser and navigate to `http://localhost:8000`
+
+## Testing
+
+To run the tests:
+```bash
+python manage.py test
+```
+
+## Development
+
+- The main Django application is in the `django-template` directory
+- Media content is organized in the `content` directory
+- Static files are served from the `static` directory
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details
